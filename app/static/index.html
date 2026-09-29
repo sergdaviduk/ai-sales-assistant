@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Sales Assistant</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#f5f6f8;color:#20242a}.top{height:64px;background:#fff;border-bottom:1px solid #e4e7eb;display:flex;align-items:center;padding:0 32px;font-weight:700}.wrap{max-width:1100px;margin:32px auto;padding:0 20px;display:grid;grid-template-columns:1.05fr .95fr;gap:22px}.card{background:#fff;border:1px solid #e4e7eb;border-radius:14px;padding:22px;box-shadow:0 4px 18px rgba(20,30,50,.04)}h1{font-size:22px;margin:0 0 6px}h2{font-size:15px;margin:0 0 12px}.muted{color:#77808c;font-size:13px;margin-bottom:20px}.bubble{background:#eef4ff;border-radius:12px 12px 3px 12px;padding:15px;margin:14px 0;line-height:1.45}textarea{width:100%;height:120px;resize:none;border:1px solid #d8dde5;border-radius:10px;padding:14px;font:inherit;outline:none}button{margin-top:12px;width:100%;border:0;border-radius:10px;background:#2563eb;color:white;padding:13px;font-weight:700;cursor:pointer}.result{min-height:122px;background:#f8fafc;border:1px solid #e7eaf0;border-radius:10px;padding:15px;line-height:1.5;margin-bottom:18px}.hint{background:#fff8e7;border-color:#f4d68b}.tag{display:inline-block;font-size:12px;background:#eef2f7;padding:5px 8px;border-radius:20px;color:#5e6875}.loading{opacity:.55}@media(max-width:800px){.wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="top">amoCRM · AI-помощник менеджера</div>
+<div class="wrap">
+<section class="card"><h1>Диалог с клиентом</h1><div class="muted">Новый входящий запрос</div><div class="bubble" id="bubble">Здравствуйте! Хочу купить ноутбук. Сколько стоит доставка?</div><textarea id="message">Здравствуйте! Хочу купить ноутбук. Сколько стоит доставка?</textarea><button id="run">Сгенерировать ответ</button></section>
+<section class="card"><h1>AI-рекомендация</h1><div class="muted">Ассистент сверяется с базой знаний</div><h2>Ответ клиенту</h2><div class="result" id="answer">Нажмите «Сгенерировать ответ».</div><h2>Подсказка менеджеру · допродажа</h2><div class="result hint" id="hint">Здесь появится внутренняя рекомендация.</div><span class="tag" id="source">Источник: —</span></section>
+</div>
+<script>
+const btn=document.getElementById('run');
+btn.onclick=async()=>{const msg=document.getElementById('message').value.trim();if(!msg)return;document.getElementById('bubble').textContent=msg;btn.disabled=true;btn.textContent='Генерирую...';document.querySelectorAll('.result').forEach(x=>x.classList.add('loading'));try{const r=await fetch('/api/v1/assistant',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg})});const d=await r.json();document.getElementById('answer').textContent=d.client_answer;document.getElementById('hint').textContent=d.manager_hint;document.getElementById('source').textContent='Источник: '+d.source}catch(e){document.getElementById('answer').textContent='Ошибка запроса';}finally{btn.disabled=false;btn.textContent='Сгенерировать ответ';document.querySelectorAll('.result').forEach(x=>x.classList.remove('loading'));}};
+</script>
+</body></html>
